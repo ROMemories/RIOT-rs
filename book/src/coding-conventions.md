@@ -83,4 +83,4 @@ To add a new workspace crate re-exported by `riot-rs`, follow these steps:
 1. Add the crate to the list of crates checked by clippy in `.github/workflows/main.yml`.
 1. Consider adding the crate to the list of crates run by cargo test in `.github/workflows/main.yml`.
 1. Re-export the crate from the `riot-rs` crate, inline it in the docs as done for the other crates, and feature-gate it if necessary.
-1. If the new crate is feature-gated and if this possible, add the feature that enables it to the ones used by cargo doc in `.github/workflows/main.yml` and in `.github/workflows/build-deploy-docs.yml`.
+1. If the new crate is feature-gated and if this is possible, add the feature that enables it to the ones used by cargo doc in `.github/workflows/main.yml` and in `.github/workflows/build-deploy-docs.yml`.
