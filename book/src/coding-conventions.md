@@ -77,7 +77,7 @@ To add a new workspace crate re-exported by `riot-rs`, follow these steps:
 
 1. Create the new crate's directory in `src/`.
 1. Run `cargo init --lib` in that directory.
-1. Move the `[lints]` section in its `Cargo.toml` above the `[dependencies]` section.
+1. In the new crate's `Cargo.toml`, move the automatically added  `[lints]` section above the `[dependencies]` section.
 1. Add a `#![deny(clippy::pedantic)]` lint to the new crate's root module, along with other relevant lints (e.g., `#![deny(missing_docs)]`); some lints are already inherited from the workspace and do not need to be added to the new crate.
 1. Cargo has added the crate to the workspace members in the workspace's `Cargo.toml`, move the added string to its own line.
 1. Add the crate to the list of crates checked by clippy in `.github/workflows/main.yml`.
