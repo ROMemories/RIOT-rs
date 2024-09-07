@@ -7,7 +7,10 @@
 mod pins;
 
 use embassy_time::{Duration, Timer};
-use reqwless::{client::HttpClient, request::Method};
+use reqwless::{
+    client::{HttpClient, TlsConfig, TlsVerify},
+    request::Method,
+};
 use riot_rs::{
     debug::log::info,
     embassy_net::{
@@ -33,7 +36,12 @@ async fn main() {
     let tcp_client = TcpClient::new(&stack, &tcp_client_state);
     let dns_client = DnsSocket::new(&stack);
 
-    let mut client = HttpClient::new(&tcp_client, &dns_client);
+    let tls_seed = 0x42424242_42424242; // FIXME: RNG this
+    let mut tls_rx_buffer = [0; 16 * 1024];
+    let mut tls_tx_buffer = [0; 16 * 1024];
+    let tls_verify = TlsVerify::None; // FIXME
+    let tls_config = TlsConfig::new(tls_seed, &mut tls_rx_buffer, &mut tls_tx_buffer, tls_verify);
+    let mut client = HttpClient::new_with_tls(&tcp_client, &dns_client, tls_config);
     let mut http_rx_buf = [0; HTTP_BUFFER_SIZE];
 
     // Wait for the network to be up (hopefully), otherwise smoltcp mDNS support panics.

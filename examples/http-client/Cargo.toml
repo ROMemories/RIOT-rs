@@ -14,7 +14,9 @@ embassy-executor = { workspace = true, default-features = false }
 embassy-net = { workspace = true, features = ["dns", "mdns", "tcp"] }
 embassy-time = { workspace = true }
 heapless = { workspace = true }
-reqwless = { version = "0.12.1", default-features = true }
+reqwless = { version = "0.12.1", default-features = true, features = [
+  "embedded-tls",
+] }
 riot-rs = { path = "../../src/riot-rs", features = [] }
 riot-rs-boards = { path = "../../src/riot-rs-boards" }
 
