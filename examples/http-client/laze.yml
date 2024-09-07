@@ -1,0 +1,9 @@
+apps:
+  - name: http-client
+    env:
+      global:
+        CARGO_ENV:
+          - CONFIG_ISR_STACKSIZE=65536
+    selects:
+      - ?release
+      - network

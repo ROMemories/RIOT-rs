@@ -16,6 +16,7 @@ subdirs:
   - gpio
   - hello-world
   - hello-world-async
+  - http-client
   - log
   - minimal
   - random

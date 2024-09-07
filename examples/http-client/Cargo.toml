@@ -1,0 +1,22 @@
+[package]
+name = "http-client"
+version = "0.1.0"
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+embassy-executor = { workspace = true, default-features = false }
+embassy-net = { workspace = true, features = ["tcp", "dns"] }
+embassy-time = { workspace = true }
+heapless = { workspace = true }
+reqwless = { version = "0.12.1", default-features = true }
+riot-rs = { path = "../../src/riot-rs", features = [] }
+riot-rs-boards = { path = "../../src/riot-rs-boards" }
+
+[target.'cfg(capability = "hw/usb-device-port")'.dependencies]
+riot-rs = { path = "../../src/riot-rs", features = ["override-usb-config"] }
