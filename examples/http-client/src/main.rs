@@ -6,13 +6,9 @@
 mod pins;
 
 use embassy_time::{Duration, Timer};
-use reqwless::{
-    client::HttpClient,
-    headers::ContentType,
-    request::{Method, RequestBuilder},
-};
+use reqwless::{client::HttpClient, request::Method};
 use riot_rs::{
-    debug::log::debug,
+    debug::log::info,
     embassy_net::{
         self,
         dns::DnsSocket,
@@ -22,6 +18,8 @@ use riot_rs::{
 };
 
 const MAX_CONCURRENT_CONNECTIONS: usize = 2;
+const TCP_BUFFER_SIZE: usize = 1024;
+const HTTP_BUFFER_SIZE: usize = 1024;
 
 #[riot_rs::task(autostart)]
 async fn main() {
@@ -29,25 +27,27 @@ async fn main() {
 
     let stack = network::network_stack().await.unwrap();
 
-    // Wait for the network connect to be up (hopefully).
-    // FIXME: do something smarter
-    Timer::after(Duration::from_secs(5)).await;
-
-    let tcp_client_state = TcpClientState::<MAX_CONCURRENT_CONNECTIONS, 1024, 1024>::new();
+    let tcp_client_state =
+        TcpClientState::<MAX_CONCURRENT_CONNECTIONS, TCP_BUFFER_SIZE, TCP_BUFFER_SIZE>::new();
     let tcp_client = TcpClient::new(&stack, &tcp_client_state);
     let dns_client = DnsSocket::new(&stack);
 
     let mut client = HttpClient::new(&tcp_client, &dns_client);
-    let mut rx_buf = [0; 1024];
-    let response = client
-        .request(Method::POST, URL)
-        .await
-        .unwrap()
-        .body(b"PING".as_slice())
-        .content_type(ContentType::TextPlain)
-        .send(&mut rx_buf)
-        .await
-        .unwrap();
+    let mut http_rx_buf = [0; HTTP_BUFFER_SIZE];
+
+    loop {
+        if let Ok(mut handle) = client.request(Method::GET, URL).await {
+            let response = handle.send(&mut http_rx_buf).await.unwrap();
+            info!("Response status: {}", response.status.0);
+            let content_type = response.content_type.as_ref().unwrap().as_str();
+            info!("Response Content-Type: {}", content_type);
+            let body = response.body().read_to_end().await.unwrap();
+            info!("{:x}", body);
+        }
+
+        // Wait a bit before retrying/making a new request
+        Timer::after(Duration::from_secs(3)).await;
+    }
 }
 
 #[riot_rs::config(network)]
