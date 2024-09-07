@@ -35,6 +35,10 @@ async fn main() {
     let mut client = HttpClient::new(&tcp_client, &dns_client);
     let mut http_rx_buf = [0; HTTP_BUFFER_SIZE];
 
+    // Wait for the network to be up (hopefully), otherwise smoltcp mDNS support panics.
+    // FIXME: do something smarter
+    Timer::after(Duration::from_secs(7)).await;
+
     loop {
         if let Ok(mut handle) = client.request(Method::GET, URL).await {
             let response = handle.send(&mut http_rx_buf).await.unwrap();
